@@ -5,3 +5,5 @@
 *.tfvars
 crash.log
 override.tf
+.vs/
+

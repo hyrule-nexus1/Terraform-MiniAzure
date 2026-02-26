@@ -1,0 +1,76 @@
+﻿# Crea un archivo docker-compose.yml con estos servicios mínimos:
+#- MinIO → simula Storage Account + backend remoto
+#- SQL Server → simula Azure SQL
+#- Nginx → simula App Service
+#- Azurite → emulador oficial de Azure Storage
+#- Vault → para secretos (equivalente a Key Vault) 
+
+#version: '3.8'
+services:
+    minio:
+        image: minio/minio
+        container_name: minio1
+        command: server /data --console-address "0.0.0.0:9001"
+        ports:
+            - "9000:9000"
+            - "9001:9001"
+        environment:
+            MINIO_ROOT_USER_FILE: /run/secrets/minio_root_user
+            MINIO_ROOT_PASSWORD_FILE: /run/secrets/minio_root_password
+            MINIO_BROWSER_REDIRECT_URL: "http://localhost:9001"
+        secrets:
+            - minio_root_user
+            - minio_root_password
+        volumes:
+            - minio_datadisk:/data
+ 
+
+    sql:
+        image: mcr.microsoft.com/mssql/server:2019-latest
+        container_name: sqlserver1
+        ports:
+        - "1433:1433"
+        environment:
+            ACCEPT_EULA: "Y"
+            MSSQL_SA_PASSWORD_FILE: /run/secrets/sql_sa_password
+        secrets:
+            - sql_sa_password
+        
+    nginx:
+        image: nginx:latest
+        container_name: nginx1
+        ports:
+            - "8080:80"
+            
+    azurite:
+        image: mcr.microsoft.com/azure-storage/azurite
+        container_name: azurite1
+        ports:
+          - "10000:10000"
+          - "10001:10001"
+          - "10002:10002"
+
+    vault:
+        image: hashicorp/vault
+        container_name: vault1
+        ports:
+            - "8200:8200"
+        environment:
+            VAULT_DEV_ROOT_TOKEN_ID: "root"
+            VAULT_DEV_LISTEN_ADDRESS: "0.0.0.0:8200"
+        secrets:
+            - vault_root_token_id   
+
+secrets:
+    minio_root_user:
+        file: ./secrets/minio_root_user.txt
+    minio_root_password:
+        file: ./secrets/minio_root_password.txt
+    sql_sa_password:
+        file: ./secrets/sql_sa_password.txt
+    vault_root_token_id:
+        file: ./secrets/vault_root_token_id.txt
+
+volumes:
+    minio_datadisk:
+    

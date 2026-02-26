@@ -1,0 +1,40 @@
+﻿# Crea un archivo docker-compose.yml con estos servicios mínimos:
+#- MinIO → simula Storage Account + backend remoto
+#- SQL Server → simula Azure SQL
+#- Nginx → simula App Service
+#- Azurite → emulador oficial de Azure Storage
+#- Vault → para secretos (equivalente a Key Vault) 
+
+#version: '3.8'
+services:
+    minio:
+        image: minio/minio
+        container_name: minio1
+        command: server /data --console-address "0.0.0.0:9001"
+        ports:
+            - "9000:9000"
+            - "9001:9001"
+        environment:
+            MINIO_ROOT_USER_FILE: /run/secrets/minio_root_user
+            MINIO_ROOT_PASSWORD_FILE: /run/secrets/minio_root_password
+            MINIO_BROWSER_REDIRECT_URL: "http://localhost:9001"
+        secrets:
+            - minio_root_user
+            - minio_root_password
+        volumes:
+            - minio_datadisk:/data
+
+    
+secrets:
+    minio_root_user:
+        file: ./secrets/minio_root_user.txt
+    minio_root_password:
+        file: ./secrets/minio_root_password.txt
+    sql_sa_password:
+        file: ./secrets/sql_sa_password.txt
+    vault_root_token_id:
+        file: ./secrets/vault_root_token_id.txt
+
+volumes:
+    minio_datadisk:
+    

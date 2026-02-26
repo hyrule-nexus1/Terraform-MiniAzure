@@ -1,0 +1,14 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\envs",
+    "\\envs\\dev.tfvars",
+    "\\envs\\prod.tfvars",
+    "\\envs\\stage.tfvars",
+    "\\modules",
+    "\\modules\\app",
+    "\\modules\\sql",
+    "\\pipelines"
+  ],
+  "PreviewInSolutionExplorer": false
+}
